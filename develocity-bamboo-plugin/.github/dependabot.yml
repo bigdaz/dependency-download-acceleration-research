@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "com.atlassian.bamboo:atlassian-bamboo-*"
+      - dependency-name: "com.atlassian.plugin:atlassian-spring-scanner-annotation"
+      - dependency-name: "org.mockito:mockito-core" # requires Java 11
+      - dependency-name: "com.google.code.gson:gson" # should be fixed to work with Bamboo 6.x

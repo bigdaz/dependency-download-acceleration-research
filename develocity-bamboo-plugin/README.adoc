@@ -1,0 +1,139 @@
+:imagesdir: images
+:thumbnail: width=80%,align="center"
+
+= Develocity Bamboo plugin
+
+== Migration Notice
+
+As of version `1.3.0`, the plugin contains the renaming from Gradle Enterprise to Develocity. However, it was still available under the same Maven coordinates.
+Version `2.0.0` updates that to `com.gradle.develocity:develocity-bamboo-plugin`. It also contains several internal changes that make it backward incompatible with `1.3.0`.
+
+Additionally, starting from `2.0.0`, the plugin is no longer available via https://marketplace.atlassian.com/apps/1230500/develocity-plugin-for-bamboo[Atlassian Marketplace] due to
+https://www.atlassian.com/migration/assess/journey-to-cloud[Atlassian's migration to the Cloud].
+
+To upgrade from `1.3.0` to `2.0.0` follow these steps:
+
+1. Take note of the current configuration settings, as after the upgrade, the plugin will need to be configured again.
+2. Uninstall the app via the `Manage Apps` section on the Bamboo Administration page.
+3. Install the new version as mentioned https://confluence.atlassian.com/bamboo/installing-a-plugin-289277265.html[here].
+4. Configure the plugin again using the configuration settings from step #1.
+
+[IMPORTANT]
+=====
+Develocity `2024.1` or above is required starting from version `2.2.0` and above. See <<_short_lived_access_tokens>> for more infos.
+=====
+
+== Overview
+
+This plugin integrates with Develocity for Gradle and Maven builds run via Bamboo.
+Build scans are available as a free service on https://scans.gradle.com[scans.gradle.com] and commercially via https://gradle.com[Develocity].
+
+For each Gradle and Maven build that is run from Bamboo, this plugin exposes the links to the created build scans in the Bamboo UI.
+The plugin can also be configured to ad-hoc connect Gradle and Maven builds to an existing Develocity instance such that a Build Scan is published each time a build is run from Bamboo.
+
+image::build-scan-links.png[Build Scan Links,{thumbnail}]
+
+== Installation
+
+The plugin can be manually installed as mentioned in https://confluence.atlassian.com/bamboo/installing-a-plugin-289277265.html[Uploading your own plugin] section. The released JARs can be found at https://github.com/gradle/develocity-bamboo-plugin/releases[Releases].
+
+Once the plugin is installed, the Bamboo Administration page will have a new section available under the “Managed Apps” group named Develocity integration.
+
+image::admin-plugin-section.png[Plugin Section,{thumbnail}]
+
+When you select the said section, the following configuration will be available
+
+image::no-autoinjection-configuration.png[Empty Plugin Configuration,{thumbnail}]
+
+== Configuration
+
+=== Using Bamboo Shared Credential for Develocity server authentication
+
+In order to specify an access key for Develocity server, you would need to create a Shared Credentials in Bamboo and reference the name of that credential in the “Shared credential name” field of the Develocity integration page.
+To create a Bamboo Shared Credentials, you’d need to navigate to the Bamboo Administration page and select the “Shared credentials” section.
+
+image::shared-credentials-section.png[Shared Credentials Section,{thumbnail}]
+
+When clicking “Add new credentials”, select the “Username and password” option from the dropdown.
+
+image::username-password-credentials.png[Username and Password Credentials,{thumbnail}]
+
+Fill the form as following:
+
+* _Credential name_ - this is the name of the credential that you’ll be referencing in the “Shared credential name” field of the Develocity integration page.
+* _Username_ - you can specify any username value here, as it will not be used by the plugin
+* _Password_ - this should be the value of the access key which is used during the build execution to get a short-lived access token from the Develocity server.
+It has a format of a key value pair (e.g. `host=value`)
+
+[#_short_lived_access_tokens]
+==== Short-lived access tokens
+Develocity access keys are long-lived, creating risks if they are leaked. To avoid this, users can use short-lived access tokens to authenticate with Develocity. Access tokens can be used wherever an access key would be used. Access tokens are only valid for the Develocity instance that created them.
+If a short-lived token fails to be retrieved (for example, if the Develocity server version is lower than `2024.1`), no access key will be set.
+In that case, Develocity authenticated operations like build cache read/write and build scan publication will fail without failing the build.
+For more information on short-lived tokens, see https://docs.gradle.com/develocity/api-manual/#short_lived_access_tokens[Develocity API documentation].
+
+=== Gradle Auto-instrumentation
+
+To enable build scan publishing for Gradle builds, the configuration would look something like presented below (using https://develocity.mycompany.com as an example of Develocity server URL and `Develocity Access Key` as a name of a Shared Credential in Bamboo).
+You’d need to specify your Develocity server URL, select “Allow untrusted server” if applicable, specify the desired Develocity Gradle plugin version and, if required, specify the name of the Bamboo shared credential that holds the access key for authenticating with the Develocity server.
+You can also override the Gradle plugin repository URL if you aren't able to use Gradle Plugin Portal due to networking or security constraints.
+
+NOTE: _Although optional, we highly suggest instrumenting the build with our https://github.com/gradle/common-custom-user-data-gradle-plugin[Common Custom User Data Gradle plugin] as well, as it will provide more details about your build_
+
+image::gradle-autoinjection-configuration.png[Gradle Auto-injection Configuration,{thumbnail}]
+
+=== Maven Auto-instrumentation
+
+To enable build scan publishing for Maven builds, the configuration would look something like presented below (using https://develocity.mycompany.com as an example of Develocity server URL and `Develocity Access Key` as a name of a Shared Credential in Bamboo).
+You’d need to specify your Develocity server URL, select “Allow untrusted server” if applicable, select “Enables Develocity Maven extension auto-injection” and, if required, specify the name of the Bamboo shared credential that holds the access key for authenticating with the Develocity server.
+
+NOTE: _Although optional, we highly suggest instrumenting the build with our https://github.com/gradle/common-custom-user-data-maven-extension[Common Custom User Data Maven extension] as well, as it will provide more details about your build_
+
+image::maven-autoinjection-configuration.png[Maven Auto-instrumentation Configuration,{thumbnail}]
+
+=== Gradle and Maven Auto-instrumentation
+
+If you have both Gradle and Maven builds in Bamboo and would like to enable build scan publishing for all, you can simply merge the configuration like this
+
+image::gradle-maven-autoinjection-configuration.png[Gradle and Maven Auto-instrumentation Configuration,{thumbnail}]
+
+== Usage
+
+Once build is completed, you’ll be able to select a build scan link directly from the Job details page in the UI (the build scan link is also present under the Metadata section on the same page)
+
+image::build-scan-links.png[Build Scan Links,{thumbnail}]
+
+== Auto-instrumentation compatibility
+
+The following sections list the compatibility of the plugin with the Develocity version based on the given build tool in use.
+
+=== For Gradle builds
+
+For Gradle builds the version used for the Develocity Gradle plugin is defined in the `Develocity Gradle plugin version` field in the `Gradle settings` section of the configuration form.
+The compatibility of the specified version with Develocity can be found https://docs.gradle.com/enterprise/compatibility/#gradle_enterprise_gradle_plugin[here].
+
+For the optional Common Custom User Data Gradle plugin which is defined the same form, you can see the compatibility of the specified version with the Develocity Gradle plugin https://github.com/gradle/common-custom-user-data-gradle-plugin#version-compatibility[here].
+
+=== For Maven builds
+
+For Maven builds the version of the Develocity Maven extension is bundled into the plugin, meaning that the user can’t change what version the Maven build is instrumented with.
+
+The following table shows the compatibility of the plugin version with Develocity:
+
+|===
+|Bamboo Plugin version  | Develocity Maven extension version        | Common Custom User Data Maven extension version  | Minimum supported Develocity version
+|Next version           | 1.21.4                                    | 2.0                                              | 2024.1
+|2.2.0                  | 1.21.2                                    | 2.0                                              | 2024.1
+|2.1.0                  | 1.21.1                                    | 2.0                                              | 2024.1
+|2.0.0                  | 1.20.1                                    | 1.12.4                                           | 2023.4
+|1.3.0                  | 1.20.1                                    | 1.12.4                                           | 2023.4
+|1.2.0                  | 1.18.1                                    | 1.12.2                                           | 2023.2
+|1.1.2                  | 1.18.1                                    | 1.12.2                                           | 2023.2
+|1.1.1                  | 1.17.4                                    | 1.12.1                                           | 2023.1
+|1.1.0                  | 1.16.6                                    | 1.11.1                                           | 2022.4
+|1.0.0                  | 1.16.4                                    | 1.11.1                                           | 2022.4
+|===
+
+== License
+
+This plugin is available under the https://github.com/gradle/develocity-bamboo-plugin/blob/main/LICENSE[Apache License, Version 2.0].

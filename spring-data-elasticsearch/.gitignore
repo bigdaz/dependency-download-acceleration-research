@@ -1,0 +1,40 @@
+.DS_Store
+*.graphml
+.springBeans
+
+atlassian-ide-plugin.xml
+
+## Ignore svn files
+.svn
+
+## ignore any target dir
+target
+
+## Ignore project files created by Eclipse
+.settings
+.project
+.classpath
+
+## Ignore project files created by IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea
+/.env
+
+
+/zap.env
+/localdocker.env
+.localdocker-env
+
+build/
+node_modules
+node
+package.json
+package-lock.json
+
+.mvn/.gradle-enterprise
+.mvn/.develocity
+
+m2_repo
+m2_repo.*

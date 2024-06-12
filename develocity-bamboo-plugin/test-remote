@@ -1,0 +1,33 @@
+#!/bin/bash
+
+rm -rf m2_repo
+rm -rf m2_repo.tgz
+rm -rf target
+
+echo "Building develocity-bamboo-plugin with dependencies from Artifactory"
+
+SECONDS=0
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-remote.xml -Dscan.tag.ARTIFACTORY_DOWNLOAD
+ARTIFACTORY_BUILD=$SECONDS
+
+echo "====== Build with Artifactory complete"
+
+rm -rf m2_repo
+
+echo "Building develocity-bamboo-plugin with dependencies from tarball"
+
+SECONDS=0
+AWS_PROFILE=gradle-cs-dev AWS_REGION=us-east-2 s5cmd cp s3://daz-test-dependency-downloads/m2_repo-develocity-bamboo-plugin.tgz m2_repo.tgz
+echo "Tarball downloaded"
+tar -xf m2_repo.tgz
+echo "Tarball extracted"
+TARBALL_EXTRACT=$SECONDS
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-remote.xml -Dscan.tag.TARBALL_DOWNLOAD
+TARBALL_BUILD=$SECONDS
+
+echo "====== Build from tarball complete"
+
+echo ""
+echo "Artifactory build: $ARTIFACTORY_BUILD sec"
+echo "Tarball build: $TARBALL_BUILD sec"
+echo " - Download and extract tarball: $TARBALL_EXTRACT sec"

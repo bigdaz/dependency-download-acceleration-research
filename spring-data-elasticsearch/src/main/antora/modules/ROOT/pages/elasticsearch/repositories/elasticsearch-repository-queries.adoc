@@ -1,0 +1,562 @@
+[[elasticsearch.query-methods]]
+= Query methods
+
+[[elasticsearch.query-methods.finders]]
+== Query lookup strategies
+
+The Elasticsearch module supports all basic query building feature as string queries, native search queries, criteria based queries or have it being derived from the method name.
+
+[[elasticsearch.query-methods.finders.declared]]
+=== Declared queries
+
+Deriving the query from the method name is not always sufficient and/or may result in unreadable method names.
+In this case one might make use of the `@Query` annotation (see xref:elasticsearch/repositories/elasticsearch-repository-queries.adoc#elasticsearch.query-methods.at-query[Using @Query Annotation] ).
+
+[[elasticsearch.query-methods.criterions]]
+== Query creation
+
+Generally the query creation mechanism for Elasticsearch works as described in xref:repositories/query-methods-details.adoc[].
+Here's a short example of what a Elasticsearch query method translates into:
+
+.Query creation from method names
+====
+[source,java]
+----
+interface BookRepository extends Repository<Book, String> {
+  List<Book> findByNameAndPrice(String name, Integer price);
+}
+----
+====
+
+The method name above will be translated into the following Elasticsearch json query
+
+[source]
+----
+{
+    "query": {
+        "bool" : {
+            "must" : [
+                { "query_string" : { "query" : "?", "fields" : [ "name" ] } },
+                { "query_string" : { "query" : "?", "fields" : [ "price" ] } }
+            ]
+        }
+    }
+}
+----
+
+A list of supported keywords for Elasticsearch is shown below.
+
+[cols="1,2,3",options="header"]
+.Supported keywords inside method names
+|===
+| Keyword
+| Sample
+| Elasticsearch Query String
+
+| `And`
+| `findByNameAndPrice`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "?", "fields" : [ "name" ] } },
+{ "query_string" : { "query" : "?", "fields" : [ "price" ] } }
+]
+}
+}}`
+
+| `Or`
+| `findByNameOrPrice`
+| `{ "query" : {
+"bool" : {
+"should" : [
+{ "query_string" : { "query" : "?", "fields" : [ "name" ] } },
+{ "query_string" : { "query" : "?", "fields" : [ "price" ] } }
+]
+}
+}}`
+
+| `Is`
+| `findByName`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "?", "fields" : [ "name" ] } }
+]
+}
+}}`
+
+| `Not`
+| `findByNameNot`
+| `{ "query" : {
+"bool" : {
+"must_not" : [
+{ "query_string" : { "query" : "?", "fields" : [ "name" ] } }
+]
+}
+}}`
+
+| `Between`
+| `findByPriceBetween`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : ?, "to" : ?, "include_lower" : true, "include_upper" : true } } }
+]
+}
+}}`
+
+| `LessThan`
+| `findByPriceLessThan`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : null, "to" : ?, "include_lower" : true, "include_upper" : false } } }
+]
+}
+}}`
+
+| `LessThanEqual`
+| `findByPriceLessThanEqual`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : null, "to" : ?, "include_lower" : true, "include_upper" : true } } }
+]
+}
+}}`
+
+| `GreaterThan`
+| `findByPriceGreaterThan`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : ?, "to" : null, "include_lower" : false, "include_upper" : true } } }
+]
+}
+}}`
+
+
+| `GreaterThanEqual`
+| `findByPriceGreaterThanEqual`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : ?, "to" : null, "include_lower" : true, "include_upper" : true } } }
+]
+}
+}}`
+
+| `Before`
+| `findByPriceBefore`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : null, "to" : ?, "include_lower" : true, "include_upper" : true } } }
+]
+}
+}}`
+
+| `After`
+| `findByPriceAfter`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"range" : {"price" : {"from" : ?, "to" : null, "include_lower" : true, "include_upper" : true } } }
+]
+}
+}}`
+
+| `Like`
+| `findByNameLike`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "?*", "fields" : [ "name" ] }, "analyze_wildcard": true }
+]
+}
+}}`
+
+| `StartingWith`
+| `findByNameStartingWith`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "?*", "fields" : [ "name" ] }, "analyze_wildcard": true }
+]
+}
+}}`
+
+| `EndingWith`
+| `findByNameEndingWith`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "*?", "fields" : [ "name" ] }, "analyze_wildcard": true }
+]
+}
+}}`
+
+| `Contains/Containing`
+| `findByNameContaining`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "\*?*", "fields" : [ "name" ] }, "analyze_wildcard": true }
+]
+}
+}}`
+
+| `In` (when annotated as FieldType.Keyword)
+| `findByNameIn(Collection<String>names)`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"bool" : {"must" : [
+{"terms" : {"name" : ["?","?"]}}
+]
+}
+}
+]
+}
+}}`
+
+
+| `In`
+| `findByNameIn(Collection<String>names)`
+| `{ "query": {"bool": {"must": [{"query_string":{"query": "\"?\" \"?\"", "fields": ["name"]}}]}}}`
+
+| `NotIn`  (when annotated as FieldType.Keyword)
+| `findByNameNotIn(Collection<String>names)`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{"bool" : {"must_not" : [
+{"terms" : {"name" : ["?","?"]}}
+]
+}
+}
+]
+}
+}}`
+
+| `NotIn`
+| `findByNameNotIn(Collection<String>names)`
+| `{"query": {"bool": {"must": [{"query_string": {"query": "NOT(\"?\" \"?\")", "fields": ["name"]}}]}}}`
+
+| `True`
+| `findByAvailableTrue`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "true", "fields" : [ "available" ] } }
+]
+}
+}}`
+
+| `False`
+| `findByAvailableFalse`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "false", "fields" : [ "available" ] } }
+]
+}
+}}`
+
+| `OrderBy`
+| `findByAvailableTrueOrderByNameDesc`
+| `{ "query" : {
+"bool" : {
+"must" : [
+{ "query_string" : { "query" : "true", "fields" : [ "available" ] } }
+]
+}
+}, "sort":[{"name":{"order":"desc"}}]
+}`
+
+| `Exists`
+| `findByNameExists`
+| `{"query":{"bool":{"must":[{"exists":{"field":"name"}}]}}}`
+
+| `IsNull`
+| `findByNameIsNull`
+| `{"query":{"bool":{"must_not":[{"exists":{"field":"name"}}]}}}`
+
+| `IsNotNull`
+| `findByNameIsNotNull`
+| `{"query":{"bool":{"must":[{"exists":{"field":"name"}}]}}}`
+
+| `IsEmpty`
+| `findByNameIsEmpty`
+| `{"query":{"bool":{"must":[{"bool":{"must":[{"exists":{"field":"name"}}],"must_not":[{"wildcard":{"name":{"wildcard":"*"}}}]}}]}}}`
+
+| `IsNotEmpty`
+| `findByNameIsNotEmpty`
+| `{"query":{"bool":{"must":[{"wildcard":{"name":{"wildcard":"*"}}}]}}}`
+
+|===
+
+NOTE: Methods names to build Geo-shape queries taking `GeoJson` parameters are not supported.
+Use `ElasticsearchOperations` with `CriteriaQuery` in a custom repository implementation if you need to have such a function in a repository.
+
+[[elasticsearch.query-methods.return-types]]
+== Method return types
+
+Repository methods can be defined to have the following return types for returning multiple Elements:
+
+* `List<T>`
+* `Stream<T>`
+* `SearchHits<T>`
+* `List<SearchHit<T>>`
+* `Stream<SearchHit<T>>`
+* `SearchPage<T>`
+
+[[elasticsearch.query-methods.at-query]]
+== Using @Query Annotation
+
+.Declare query on the method using the `@Query` annotation.
+====
+The arguments passed to the method can be inserted into placeholders in the query string. The placeholders are of the form `?0`, `?1`, `?2` etc. for the first, second, third parameter and so on.
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("{\"match\": {\"name\": {\"query\": \"?0\"}}}")
+    Page<Book> findByName(String name,Pageable pageable);
+}
+----
+
+The String that is set as the annotation argument must be a valid Elasticsearch JSON query.
+It will be sent to Easticsearch as value of the query element; if for example the function is called with the parameter _John_, it would produce the following query body:
+
+[source,json]
+----
+{
+  "query": {
+    "match": {
+      "name": {
+        "query": "John"
+      }
+    }
+  }
+}
+----
+====
+.`@Query` annotation on a method taking a Collection argument
+====
+A repository method such as
+[source,java]
+----
+@Query("{\"ids\": {\"values\": ?0 }}")
+List<SampleEntity> getByIds(Collection<String> ids);
+----
+would make an https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html[IDs query] to return all the matching documents. So calling the method with a `List` of `["id1", "id2", "id3"]` would produce the query body
+[source,json]
+----
+{
+  "query": {
+    "ids": {
+      "values": ["id1", "id2", "id3"]
+    }
+  }
+}
+----
+====
+
+[[elasticsearch.query-methods.at-query.spel]]
+=== Using SpEL Expressions
+
+.Declare query on the method using the `@Query` annotation with SpEL expression.
+====
+https://docs.spring.io/spring-framework/reference/core/expressions.html[SpEL expression] is also supported when defining query in `@Query`.
+
+
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+        {
+          "bool":{
+            "must":[
+              {
+                "term":{
+                  "name": "#{#name}"
+                }
+              }
+            ]
+          }
+        }
+        """)
+    Page<Book> findByName(String name, Pageable pageable);
+}
+----
+
+If for example the function is called with the parameter _John_, it would produce the following query body:
+
+[source,json]
+----
+{
+  "bool":{
+    "must":[
+      {
+        "term":{
+          "name": "John"
+        }
+      }
+    ]
+  }
+}
+----
+====
+
+.accessing parameter property.
+====
+Supposing that we have the following class as query parameter type:
+[source,java]
+----
+public record QueryParameter(String value) {
+}
+----
+
+It's easy to access the parameter by `#` symbol, then reference the property `value` with a simple `.`:
+
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "term":{
+                      "name": "#{#parameter.value}"
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(QueryParameter parameter, Pageable pageable);
+}
+----
+
+We can pass `new QueryParameter("John")` as the parameter now, and it will produce the same query string as above.
+====
+
+.accessing bean property.
+====
+https://docs.spring.io/spring-framework/reference/core/expressions/language-ref/bean-references.html[Bean property] is also supported to access. Given that there is a bean named `queryParameter` of type `QueryParameter`, we can access the bean with symbol `@` rather than `#`, and there is no need to declare a parameter of type `QueryParameter` in the query method:
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "term":{
+                      "name": "#{@queryParameter.value}"
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(Pageable pageable);
+}
+----
+====
+
+.SpEL and `Collection` param.
+====
+`Collection` parameter is also supported and is as easy to use as normal `String`, such as the following `terms` query:
+
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "terms":{
+                      "name": #{#names}
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(Collection<String> names, Pageable pageable);
+}
+----
+
+NOTE: collection values should not be quoted when declaring the elasticsearch json query.
+
+A collection of `names` like `List.of("name1", "name2")` will produce the following terms query:
+[source,json]
+----
+{
+  "bool":{
+    "must":[
+      {
+        "terms":{
+          "name": ["name1", "name2"]
+        }
+      }
+    ]
+  }
+}
+----
+====
+
+.access property in the `Collection` param.
+====
+https://docs.spring.io/spring-framework/reference/core/expressions/language-ref/collection-projection.html[SpEL Collection Projection] is convenient to use when values in the `Collection` parameter is not plain `String`:
+
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "terms":{
+                      "name": #{#parameters.![value]}
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(Collection<QueryParameter> parameters, Pageable pageable);
+}
+----
+This will extract all the `value` property values as a new `Collection` from `QueryParameter` collection, thus takes the same effect as above.
+====
+
+.alter parameter name by using `@Param`
+====
+When accessing the parameter by SpEL, it's also useful to alter the parameter name to another one by `@Param` annotation in Sping Data:
+
+[source,java]
+----
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "terms":{
+                      "name": #{#another.![value]}
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(@Param("another") Collection<QueryParameter> parameters, Pageable pageable);
+}
+----
+
+====

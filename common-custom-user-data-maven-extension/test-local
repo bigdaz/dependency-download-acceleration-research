@@ -1,0 +1,32 @@
+#!/bin/bash
+
+rm -rf m2_repo
+rm -rf m2_repo.*
+rm -rf target
+
+echo "Building common-custom-user-data-maven-extension with dependencies from Artifactory"
+
+SECONDS=0
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.ARTIFACTORY_DOWNLOAD
+ARTIFACTORY_BUILD=$SECONDS
+
+echo "====== Build with Artifactory complete"
+
+tar -czf m2_repo.tgz m2_repo
+
+rm -rf m2_repo
+
+echo "Building common-custom-user-data-maven-extension with dependencies from tarball"
+
+SECONDS=0
+tar -xf m2_repo.tgz
+TARBALL_EXTRACT=$SECONDS
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.TARBALL_DOWNLOAD
+TARBALL_BUILD=$SECONDS
+
+echo "====== Build from tarball complete"
+
+echo ""
+echo "Artifactory build: $ARTIFACTORY_BUILD sec"
+echo "Tarball build: $TARBALL_BUILD sec"
+echo " - Extract tarball: $TARBALL_EXTRACT sec"
