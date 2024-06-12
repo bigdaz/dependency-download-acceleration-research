@@ -4,7 +4,7 @@ rm -rf m2_repo
 rm -rf m2_repo.tgz
 rm -rf target
 
-echo "Building spring-data-elasticsearch with dependencies from Artifactory"
+echo "Building spring-data-elasticsearch with dependencies from remote Artifactory"
 
 SECONDS=0
 ./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-remote.xml -Dscan.tag.ARTIFACTORY_DOWNLOAD
@@ -14,7 +14,7 @@ echo "====== Build with Artifactory complete"
 
 rm -rf m2_repo
 
-echo "Building spring-data-elasticsearch with dependencies from tarball"
+echo "Building spring-data-elasticsearch with dependencies from remote tarball"
 
 SECONDS=0
 AWS_PROFILE=gradle-cs-dev AWS_REGION=us-east-2 s5cmd cp s3://daz-test-dependency-downloads/m2_repo-spring-data-elasticsearch.tgz m2_repo.tgz
