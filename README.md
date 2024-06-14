@@ -1,20 +1,28 @@
 # Dependency download acceleration research
 
+## M2 Repository sizes
+
+| Project | Uncompressed M2 Repo | Compressed tarball |
+| --- | --- | --- | 
+| ccud-maven-extension | 82Mb | 69Mb |
+| spring-data-elasticsearch | 283Mb | 249Mb |
+| develocity-bamboo-plugin | 539Mb | 461Mb |
+
 ## Results for Local
 
 | Project | Artifactory | Tarball | 
-| --- | --- | --- |
-| ccud-maven-extension | [5](https://ge.solutions-team.gradle.com/s/y6o33ojuipick) | [5](https://ge.solutions-team.gradle.com/s/qdtcmayfmvfq2) | 
-| spring-data-elasticsearch | [13](https://ge.solutions-team.gradle.com/s/zilrhevq46vly) | [12](https://ge.solutions-team.gradle.com/s/igeab5ltqylvm) |
-| develocity-bamboo-plugin | [38](https://ge.solutions-team.gradle.com/s/e4aomaddflt4g) | [31](https://ge.solutions-team.gradle.com/s/t7l4q65fhcffm) |
+| --- | --- | --- | 
+| ccud-maven-extension | [5 sec](https://ge.solutions-team.gradle.com/s/y6o33ojuipick) | [5 sec](https://ge.solutions-team.gradle.com/s/qdtcmayfmvfq2) |
+| spring-data-elasticsearch | [13 sec](https://ge.solutions-team.gradle.com/s/zilrhevq46vly) | [12 sec](https://ge.solutions-team.gradle.com/s/igeab5ltqylvm) |
+| develocity-bamboo-plugin | [38 sec](https://ge.solutions-team.gradle.com/s/e4aomaddflt4g) | [31 sec](https://ge.solutions-team.gradle.com/s/t7l4q65fhcffm) |
 
 ## Results for Remote
 
 | Project  | Artifactory | Tarball |
 | --- | --- | --- |
-| ccud-maven-extension | [46](https://ge.solutions-team.gradle.com/s/x4ydjq4o2inua) | [11](https://ge.solutions-team.gradle.com/s/hmfetl4oeevim) |
-| spring-data-elasticsearch | [113](https://ge.solutions-team.gradle.com/s/ksyz57sdygcwi) | [32](https://ge.solutions-team.gradle.com/s/srpthbrgqs4la) |
-| develocity-bamboo-plugin | [276](https://ge.solutions-team.gradle.com/s/6tb33nnw2slka) | [55](https://ge.solutions-team.gradle.com/s/h5sduwdpfpj3c) |
+| ccud-maven-extension | [46 sec](https://ge.solutions-team.gradle.com/s/x4ydjq4o2inua) | [11 sec](https://ge.solutions-team.gradle.com/s/hmfetl4oeevim) |
+| spring-data-elasticsearch | [113 sec](https://ge.solutions-team.gradle.com/s/ksyz57sdygcwi) | [32 sec](https://ge.solutions-team.gradle.com/s/srpthbrgqs4la) |
+| develocity-bamboo-plugin | [276 sec](https://ge.solutions-team.gradle.com/s/6tb33nnw2slka) | [55 sec](https://ge.solutions-team.gradle.com/s/h5sduwdpfpj3c) |
 
 ## Raw Results
 
