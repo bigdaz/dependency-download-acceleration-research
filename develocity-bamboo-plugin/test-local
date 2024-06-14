@@ -7,7 +7,7 @@ rm -rf target
 echo "Building develocity-bamboo-plugin with dependencies from local Artifactory"
 
 SECONDS=0
-./mvnw clean package -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.ARTIFACTORY_DOWNLOAD
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.ARTIFACTORY_DOWNLOAD
 ARTIFACTORY_BUILD=$SECONDS
 
 echo "====== Build with Artifactory complete"
