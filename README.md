@@ -12,9 +12,9 @@
 
 | Project | Artifactory | Tarball | 
 | --- | --- | --- | 
-| ccud-maven-extension | [5 sec](https://ge.solutions-team.gradle.com/s/y6o33ojuipick) | [5 sec](https://ge.solutions-team.gradle.com/s/qdtcmayfmvfq2) |
-| spring-data-elasticsearch | [13 sec](https://ge.solutions-team.gradle.com/s/zilrhevq46vly) | [12 sec](https://ge.solutions-team.gradle.com/s/igeab5ltqylvm) |
-| develocity-bamboo-plugin | [38 sec](https://ge.solutions-team.gradle.com/s/e4aomaddflt4g) | [31 sec](https://ge.solutions-team.gradle.com/s/t7l4q65fhcffm) |
+| ccud-maven-extension | [8 sec](https://ge.solutions-team.gradle.com/s/ajmeb2jmfm67i) | [8 sec](https://ge.solutions-team.gradle.com/s/3b3mlhy3lelbm) |
+| spring-data-elasticsearch | [19 sec](https://ge.solutions-team.gradle.com/s/ozpmyiyirjttm) | [16 sec](https://ge.solutions-team.gradle.com/s/2moofosizlqs6) |
+| develocity-bamboo-plugin | [51 sec](https://ge.solutions-team.gradle.com/s/shiheqy5so426) | [45 sec](https://ge.solutions-team.gradle.com/s/53r6slf23x2iq) |
 
 ## Results for Remote
 
@@ -36,8 +36,9 @@ Building common-custom-user-data-maven-extension with dependencies from local Ar
 Building common-custom-user-data-maven-extension with dependencies from local tarball
 ====== Build from tarball complete
 
-Artifactory build: 5 sec
-Tarball build: 5 sec
+Artifactory build: 8 sec
+Tarball build: 8 sec
+ - Extract tarball: 1 sec
 ```
 
 #### spring-data-elasticsearch
@@ -48,8 +49,8 @@ Building spring-data-elasticsearch with dependencies from local Artifactory
 Building spring-data-elasticsearch with dependencies from local tarball
 ====== Build from tarball complete
 
-Artifactory build: 13 sec
-Tarball build: 12 sec
+Artifactory build: 19 sec
+Tarball build: 16 sec
  - Extract tarball: 3 sec
 ```
 
@@ -61,9 +62,9 @@ Building develocity-bamboo-plugin with dependencies from local Artifactory
 Building develocity-bamboo-plugin with dependencies from local tarball
 ====== Build from tarball complete
 
-Artifactory build: 38 sec
-Tarball build: 31 sec
- - Extract tarball: 13 sec
+Artifactory build: 51 sec
+Tarball build: 45 sec
+ - Extract tarball: 12 sec
 ```
 
 ### Remote - download and restore tarball from S3, read from AWS-hosted Artifactory
