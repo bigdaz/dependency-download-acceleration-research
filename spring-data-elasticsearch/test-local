@@ -1,27 +1,32 @@
 #!/bin/bash
 
 rm -rf m2_repo
-rm -rf m2_repo.*
 rm -rf target
+rm -rf ~/.m2/.develocity/fingerprint-cache
+rm -rf ~/.m2/.develocity/token-cache
 
 echo "Building spring-data-elasticsearch with dependencies from local Artifactory"
 
 SECONDS=0
-./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.ARTIFACTORY_DOWNLOAD
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.LOCAL_ARTIFACTORY_DOWNLOAD
 ARTIFACTORY_BUILD=$SECONDS
 
 echo "====== Build with Artifactory complete"
 
+rm m2_repo.tgz
 tar -czf m2_repo.tgz m2_repo
 
 rm -rf m2_repo
+rm -rf target
+rm -rf ~/.m2/.develocity/fingerprint-cache
+rm -rf ~/.m2/.develocity/token-cache
 
 echo "Building spring-data-elasticsearch with dependencies from local tarball"
 
 SECONDS=0
 tar -xf m2_repo.tgz
 TARBALL_EXTRACT=$SECONDS
-./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.TARBALL_DOWNLOAD
+./mvnw clean package -q -Dmaven.repo.local=m2_repo -s ../settings-local.xml -Dscan.tag.LOCAL_TARBALL_EXTRACT
 TARBALL_BUILD=$SECONDS
 
 echo "====== Build from tarball complete"
