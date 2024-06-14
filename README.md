@@ -20,9 +20,9 @@
 
 | Project  | Artifactory | Tarball |
 | --- | --- | --- |
-| ccud-maven-extension | [46 sec](https://ge.solutions-team.gradle.com/s/x4ydjq4o2inua) | [11 sec](https://ge.solutions-team.gradle.com/s/hmfetl4oeevim) |
-| spring-data-elasticsearch | [113 sec](https://ge.solutions-team.gradle.com/s/ksyz57sdygcwi) | [32 sec](https://ge.solutions-team.gradle.com/s/srpthbrgqs4la) |
-| develocity-bamboo-plugin | [276 sec](https://ge.solutions-team.gradle.com/s/6tb33nnw2slka) | [55 sec](https://ge.solutions-team.gradle.com/s/h5sduwdpfpj3c) |
+| ccud-maven-extension | [39 sec](https://ge.solutions-team.gradle.com/s/yjz7bfye4wyic) | [14 sec](https://ge.solutions-team.gradle.com/s/7ecfwtocimdzi) |
+| spring-data-elasticsearch | [95 sec](https://ge.solutions-team.gradle.com/s/ndm5l7qdh2na4) | [37 sec](https://ge.solutions-team.gradle.com/s/5zlgeghbtnxn6) |
+| develocity-bamboo-plugin | [289 sec](https://ge.solutions-team.gradle.com/s/f5xcdyvizxeey) | [74 sec](https://ge.solutions-team.gradle.com/s/jm4z4754ijcck) |
 
 ## Raw Results
 
@@ -80,9 +80,9 @@ Tarball downloaded
 Tarball extracted
 ====== Build from tarball complete
 
-Artifactory build: 46 sec
-Tarball build: 11 sec
- - Download and extract tarball: 8 sec
+Artifactory build: 39 sec
+Tarball build: 14 sec
+ - Download and extract tarball: 7 sec
 ```
 
 #### spring-data-elasticsearch
@@ -96,9 +96,9 @@ Tarball downloaded
 Tarball extracted
 ====== Build from tarball complete
 
-Artifactory build: 113 sec
-Tarball build: 32 sec
- - Download and extract tarball: 24 sec
+Artifactory build: 95 sec
+Tarball build: 37 sec
+ - Download and extract tarball: 21 sec
 ```
 
 #### develocity-bamboo-plugin
@@ -112,7 +112,7 @@ Tarball downloaded
 Tarball extracted
 ====== Build from tarball complete
 
-Artifactory build: 276 sec
-Tarball build: 55 sec
- - Download and extract tarball: 37 sec
+Artifactory build: 289 sec
+Tarball build: 74 sec
+ - Download and extract tarball: 41 sec
 ```
